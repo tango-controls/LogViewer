@@ -30,9 +30,4 @@ public class HistoryArea extends JTextArea {
         JScrollBar vsb = mScrollPane.getVerticalScrollBar();
         vsb.setValue(vsb.getMaximum());
     }
-    //=========================================================================
-    public void clear() {
-      setText("");
-    }
-
 }

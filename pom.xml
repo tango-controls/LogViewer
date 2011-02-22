@@ -2,26 +2,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-
-    <parent>
+	<parent>
 		<groupId>fr.soleil</groupId>
-		<artifactId>super-pom-java</artifactId>
-		<version>RELEASE</version>
+		<artifactId>super-pom</artifactId>
+		<version>1.1</version>
 	</parent>
-
+	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.esrf.gui</groupId>
 	<artifactId>LogViewer</artifactId>
-	<version>1.2.2</version>
-
-    <name>LogViewer</name>
-
+	<name>LogViewer</name>
+	<version>1.2.1</version>
 	<scm>
-		<connection>${scm.connection.cvs.tango-cs}:tango/tools/logviewer</connection>
-		<developerConnection>${scm.developerConnection.cvs.tango-cs}:tango/tools/logviewer</developerConnection>
-		<url>${scm.url.cvs.tango-cs}/tango/tools/logviewer</url>
+		<connection>
+			scm:cvs:pserver:anonymous:@tango-cs.cvs.sourceforge.net:/cvsroot/tango-cs:tango/tools/logviewer
+		</connection>
+		<developerConnection>
+			scm:cvs:pserver:tango-cs.cvs.sourceforge.net:/cvsroot/tango-cs:tango/tools/logviewer
+		</developerConnection>
+		<url>
+			http://tango-cs.cvs.sourceforge.net/tango-cs/tango/tools/logviewer
+		</url>
 	</scm>
-
 	<build>
 		<sourceDirectory>target/src</sourceDirectory>
 		<resources>
@@ -73,18 +74,23 @@
 		<dependency>
 			<groupId>fr.esrf.tango</groupId>
 			<artifactId>TangORB</artifactId>
+			<version>${TangORB.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.esrf.atk</groupId>
 			<artifactId>ATKCore</artifactId>
+			<version>${ATKCore.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.esrf.atk</groupId>
 			<artifactId>ATKWidget</artifactId>
+			<version>${ATKWidget.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
 		</dependency>
 	</dependencies>
 </project>
+
