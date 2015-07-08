@@ -16,7 +16,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.apache.log4j.Logger;
 
 /**
  * A panel for showing a stack trace.
@@ -25,31 +24,16 @@ import org.apache.log4j.Logger;
  */
 public class DetailPanel
     extends JPanel
-    implements ListSelectionListener
-{
-    /** used to log events **/
-    private static final Logger LOG = Logger.getLogger(DetailPanel.class);
+    implements ListSelectionListener {
 
     /** used to format the logging event **/
     private static final MessageFormat FORMATTER = new MessageFormat(
-        /*
-            "<b>Time:</b> <code>{0,time,medium}</code>" +
-            "&nbsp;&nbsp;<b>Priority:</b> <code>{1}</code>" +
-            "&nbsp;&nbsp;<b>Thread:</b> <code>{2}</code>" +
-            "&nbsp;&nbsp;<b>NDC:</b> <code>{3}</code>" +
-            "<br><b>Device:</b> <code>{4}</code>" +
-            "<br><b>Location:</b> <code>{5}</code>" +
-            "<br><b>Message:</b>" +
-            "<pre>{6}</pre>" +
-            "<b>Throwable:</b>" +
-            "<pre>{7}</pre>");
-        */
-    
         "<b>Time:</b> <code>{0}</code>"               +
         "&nbsp;&nbsp;<b>Level:</b> <code>{1}</code>"  +
         "&nbsp;&nbsp;<b>Device:</b> <code>{3}</code>" +
         "&nbsp;&nbsp;<b>Thread:</b> <code>{2}</code>" +
-        "<pre>{4}</pre>");
+        "<pre>{4}</pre>"
+    );
     
     /** the model for the data to render **/
     private final MyTableModel mModel;
@@ -114,15 +98,16 @@ public class DetailPanel
      * @param aEvent contains the throwable information
      * @return a <code>String</code> value
      */
+    @SuppressWarnings("unused")
     private static String getThrowableStrRep(EventDetails aEvent) {
-        final String[] strs = aEvent.getThrowableStrRep();
-        if (strs == null) {
+        final String[] throwableList = aEvent.getThrowableStrRep();
+        if (throwableList == null) {
             return null;
         }
 
-        final StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < strs.length; i++) {
-            sb.append(strs[i]).append("\n");
+        final StringBuilder sb = new StringBuilder();
+        for (String str : throwableList) {
+            sb.append(str).append("\n");
         }
 
         return sb.toString();
@@ -139,7 +124,7 @@ public class DetailPanel
             return null;
         }
 
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         for (int i = 0; i < aStr.length(); i++) {
             char c = aStr.charAt(i);
             switch (c) {

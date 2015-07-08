@@ -10,46 +10,47 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 abstract class TangoNode extends DefaultMutableTreeNode {
 
-  private boolean areChildrenDefined = false;
-  Database db;
+    private boolean areChildrenDefined = false;
+    Database db;
 
-  // Create node on the fly and return number of child
+    // Create node on the fly and return number of child
 
-  public int getChildCount() {
+    public int getChildCount() {
 
-    try {
+        try {
 
-      if (!areChildrenDefined) {
-        areChildrenDefined = true;
-        populateNode();
-      }
+            if (!areChildrenDefined) {
+                areChildrenDefined = true;
+                populateNode();
+            }
 
-    } catch (DevFailed e) {
+        } catch (DevFailed e) {
 
-      Main.showTangoError(e);
+            Main.showTangoError(e);
+
+        }
+
+        return super.getChildCount();
 
     }
 
-    return super.getChildCount();
+    // Clear all child nodes
 
-  }
+    @SuppressWarnings("unused")
+    public void clearNodes() {
+        removeAllChildren();
+        areChildrenDefined = false;
+    }
 
-  // Clear all child nodes
+    // Fill children list
 
-  public void clearNodes() {
-    removeAllChildren();
-    areChildrenDefined = false;
-  }
+    abstract void populateNode() throws DevFailed;
 
-  // Fill children list
+    // Returns true if the node is a leaf, false otherwise
 
-  abstract void populateNode() throws DevFailed;
-
-  // Returns true if the node is a leaf, false otherwise
-
-  public boolean isLeaf() {
-    return false;
-  }
+    public boolean isLeaf() {
+        return false;
+    }
 
 }
 
@@ -58,104 +59,87 @@ abstract class TangoNode extends DefaultMutableTreeNode {
 
 class RootNode extends TangoNode {
 
-  RootNode(Database db) {
-    this.db = db;
-  }
-
-  void populateNode() throws DevFailed {
-
-      String[] list = db.get_device_domain("*");
-      for (int i = 0; i < list.length; i++)
-        add(new DomainNode(db,list[i]));
-
-  }
-
-  public String toString() {
-    return "Device: ";
-  }
-
+    RootNode(Database db) {
+        this.db = db;
+    }
+    void populateNode() throws DevFailed {
+        String[] domains = db.get_device_domain("*");
+        for (String domain : domains)
+            add(new DomainNode(db, domain));
+    }
+    public String toString() {
+        return "Device: ";
+    }
 }
 
 // ---------------------------------------------------------------
 
 class DomainNode extends TangoNode {
 
-  String domain;
-
-  DomainNode(Database db,String domain) {
-    this.db = db;
-    this.domain = domain;
-  }
-
-  void populateNode() throws DevFailed {
-
-      String[] list = db.get_device_family(domain + "/*");
-      for (int i = 0; i < list.length; i++)
-        add(new FamilyNode(db,domain, list[i]));
-
-  }
-
-  public String toString() {
-    return domain;
-  }
-
+    String domain;
+    DomainNode(Database db, String domain) {
+        this.db = db;
+        this.domain = domain;
+    }
+    void populateNode() throws DevFailed {
+        String[] families = db.get_device_family(domain + "/*");
+        for (String family : families)
+            add(new FamilyNode(db, domain, family));
+    }
+    public String toString() {
+        return domain;
+    }
 }
 
 // ---------------------------------------------------------------
 
 class FamilyNode extends TangoNode {
 
-  String domain;
-  String family;
-
-  FamilyNode(Database db,String domain, String family) {
-    this.domain = domain;
-    this.family = family;
-    this.db = db;
-  }
-
-  void populateNode() throws DevFailed {
-
-      String prefix = domain + "/" + family + "/";
-      String[] list = db.get_device_member(prefix + "*");
-      for (int i = 0; i < list.length; i++)
-        add(new DeviceNode(db,domain,family,list[i]));
-
-  }
-
-  public String toString() {
-    return family;
-  }
-
+    String domain;
+    String family;
+    FamilyNode(Database db, String domain, String family) {
+        this.domain = domain;
+        this.family = family;
+        this.db = db;
+    }
+    void populateNode() throws DevFailed {
+        String prefix = domain + "/" + family + "/";
+        String[] members = db.get_device_member(prefix + "*");
+        for (String member : members)
+            add(new DeviceNode(db, domain, family, member));
+    }
+    public String toString() {
+        return family;
+    }
 }
 
 // ---------------------------------------------------------------
 
 class DeviceNode extends TangoNode {
 
-  String domain;
-  String family;
-  String member;
-  String devName;
+    String domain;
+    String family;
+    String member;
+    String devName;
 
-  DeviceNode(Database db,String domain, String family,String member) {
-    this.domain = domain;
-    this.family = family;
-    this.member = member;
-    this.db = db;
-    devName = this.domain + "/" + this.family + "/" + member;
-  }
+    DeviceNode(Database db, String domain, String family, String member) {
+        this.domain = domain;
+        this.family = family;
+        this.member = member;
+        this.db = db;
+        devName = this.domain + "/" + this.family + "/" + member;
+    }
 
-  void populateNode() throws DevFailed {
-  }
+    void populateNode() throws DevFailed {
+    }
 
-  public String toString() {
-    return member;
-  }
+    public String toString() {
+        return member;
+    }
 
-  public boolean isLeaf() {
-    return true;
-  }
+    public boolean isLeaf() {
+        return true;
+    }
 
 }
 

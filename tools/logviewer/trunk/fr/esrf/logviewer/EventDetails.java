@@ -42,12 +42,12 @@ public class EventDetails {
 
     /** used to format dates **/
     private static final DateFormat mDateFormatter =
-        DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+        DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     
     /**
      * Creates a new <code>EventDetails</code> instance.
      * @param aTimeStamp a <code>long</code> value
-     * @param aPriority a <code>Priority</code> value
+     * @param aLevel a <code>Priority</code> value
      * @param aCategoryName a <code>String</code> value
      * @param aNDC a <code>String</code> value
      * @param aThreadName a <code>String</code> value
@@ -65,8 +65,9 @@ public class EventDetails {
                          String aLocationDetails)
     {
         mTimeStamp = aTimeStamp;
-        Timestamp tms = new Timestamp(mTimeStamp);
-        mTimeStampStr = mDateFormatter.format(new Date(mTimeStamp)) + "." + (tms.getNanos() / 1000000);    
+        Timestamp tms = new Timestamp(aTimeStamp);
+        mTimeStampStr = mDateFormatter.format(new Date(aTimeStamp))
+                + "." + String.format("%03d", (tms.getNanos() / 1000000));
         mLevel = aLevel;
         mCategoryName = aCategoryName;
         mNDC = aNDC;
@@ -74,23 +75,24 @@ public class EventDetails {
         mMessage = aMessage;
         mThrowableStrRep = aThrowableStrRep;
         mLocationDetails = aLocationDetails;
-    } 
+    }
 
     /**
      * Creates a new <code>EventDetails</code> instance.
      *
-     * @param aEvent a <code>LoggingEvent</code> value
+     * @param anEvent a <code>LoggingEvent</code> value
      */
+    @SuppressWarnings("unused")
     EventDetails(LoggingEvent anEvent) {
         this(anEvent.timeStamp,
-             anEvent.getLevel(),
-             anEvent.getLoggerName(),
-             anEvent.getNDC(),
-             anEvent.getThreadName(),
-             anEvent.getRenderedMessage(),
-             anEvent.getThrowableStrRep(),
-             (anEvent.getLocationInformation() == null)
-             ? null : anEvent.getLocationInformation().fullInfo);
+                anEvent.getLevel(),
+                anEvent.getLoggerName(),
+                anEvent.getNDC(),
+                anEvent.getThreadName(),
+                anEvent.getRenderedMessage(),
+                anEvent.getThrowableStrRep(),
+                (anEvent.getLocationInformation()==null)
+                        ? null : anEvent.getLocationInformation().fullInfo);
     }
 
     /** @see #mTimeStamp **/
@@ -102,7 +104,7 @@ public class EventDetails {
         return mTimeStampStr;
     }
     
-    /** @see #mPriority **/
+    /** @see #mLevel **/
     Level getLevel() {
         return mLevel;
     }
@@ -113,6 +115,7 @@ public class EventDetails {
     }
 
     /** @see #mNDC **/
+    @SuppressWarnings("unused")
     String getNDC() {
         return mNDC;
     }
@@ -128,6 +131,7 @@ public class EventDetails {
     }
 
     /** @see #mLocationDetails **/
+    @SuppressWarnings("unused")
     String getLocationDetails(){
         return mLocationDetails;
     }

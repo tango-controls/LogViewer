@@ -32,6 +32,7 @@ class ExitAction extends AbstractAction
      */
     public void actionPerformed(ActionEvent aIgnore) {
         LOG.info("shutting down");
+        System.out.println("shutting down");
         Main.cleanup();
         System.exit(0);
     }
