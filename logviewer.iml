@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/bin" />
+    <output-test url="file://$MODULE_DIR$/bin" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
@@ -10,7 +12,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../release/java/lib/ATKWidget.jar!/" />
+          <root url="jar://Y:/tango/release/java/lib/ATKCore.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -19,7 +21,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../release/java/lib/ATKCore.jar!/" />
+          <root url="jar://Y:/tango/release/java/lib/ATKWidget.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,7 +30,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../release/java/lib/TangORB.jar!/" />
+          <root url="jar://Y:/tango/release/java/lib/log4j.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -37,7 +39,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../release/java/lib/log4j.jar!/" />
+          <root url="jar://Y:/tango/release/java/lib/JTango.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -45,4 +47,3 @@
     </orderEntry>
   </component>
 </module>
-
