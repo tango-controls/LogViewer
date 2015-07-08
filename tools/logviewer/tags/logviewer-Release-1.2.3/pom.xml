@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+		<groupId>fr.soleil</groupId>
+		<artifactId>super-pom-java</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<groupId>fr.esrf.gui</groupId>
+	<artifactId>LogViewer</artifactId>
+	<version>1.2.2</version>
+
+    <name>LogViewer</name>
+
+	<scm>
+		<connection>${scm.connection.cvs.tango-cs}:tango/tools/logviewer</connection>
+		<developerConnection>${scm.developerConnection.cvs.tango-cs}:tango/tools/logviewer</developerConnection>
+		<url>${scm.url.cvs.tango-cs}/tango/tools/logviewer</url>
+	</scm>
+
+	<build>
+		<sourceDirectory>target/src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>target/src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<ant
+									antfile="${basedir}/pombuild.xml">
+									<target name="prepareSource" />
+								</ant>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>fr.soleil.maven.plugins</groupId>
+				<artifactId>maven-script-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>fr.esrf.logviewer.Main</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>fr.esrf.tango</groupId>
+			<artifactId>TangORB</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>fr.esrf.atk</groupId>
+			<artifactId>ATKCore</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>fr.esrf.atk</groupId>
+			<artifactId>ATKWidget</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+	</dependencies>
+</project>
