@@ -6,9 +6,7 @@
  * distribution in the LICENSE.txt file.  */
 package fr.esrf.logviewer;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.sql.Timestamp;
+import java.util.*;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
@@ -40,10 +38,26 @@ public class EventDetails {
     /** the location details for the event **/
     private final String mLocationDetails;
 
-    /** used to format dates **/
+    /** used to format dates
     private static final DateFormat mDateFormatter =
         DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    
+    **/
+    //===============================================================
+    public static String formatDate(long ms) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(ms);
+        int day    = calendar.get(Calendar.DAY_OF_MONTH);
+        int month  = calendar.get(Calendar.MONTH)+1;
+        int year   = calendar.get(Calendar.YEAR)-2000;
+        int hour   = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes= calendar.get(Calendar.MINUTE);
+        int seconds= calendar.get(Calendar.SECOND);
+        int millis = calendar.get(Calendar.MILLISECOND);
+        return String.format("%02d/%02d/%02d  %02d:%02d:%02d.%03d",
+                day, month, year, hour, minutes, seconds, millis);
+    }
+    //===============================================================
+
     /**
      * Creates a new <code>EventDetails</code> instance.
      * @param aTimeStamp a <code>long</code> value
@@ -65,9 +79,12 @@ public class EventDetails {
                          String aLocationDetails)
     {
         mTimeStamp = aTimeStamp;
+        /****
         Timestamp tms = new Timestamp(aTimeStamp);
         mTimeStampStr = mDateFormatter.format(new Date(aTimeStamp))
                 + "." + String.format("%03d", (tms.getNanos() / 1000000));
+        ****/
+        mTimeStampStr = formatDate(aTimeStamp);
         mLevel = aLevel;
         mCategoryName = aCategoryName;
         mNDC = aNDC;
