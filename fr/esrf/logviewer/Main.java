@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class Main extends JFrame {
 
-    private final static String APP_RELEASE = "2.0.0";
+    private final static String APP_RELEASE = "2.0.1";
 
     // use to log messages
     private static final Logger LOG = Logger.getLogger(Main.class);
@@ -234,7 +234,7 @@ public class Main extends JFrame {
         LogTableRowRenderer dtcr = new LogTableRowRenderer();
         int i = 0;
         TableColumn tc;
-        int col_width[] = {50, 140, 75, 155, 500};
+        int col_width[] = {50, 160, 75, 160, 500};
         int width = 0;
         while (cenum.hasMoreElements()) {
             width += col_width[i];
@@ -982,6 +982,5 @@ public class Main extends JFrame {
     public static void main(String[] aArgs) {
         new Main(aArgs, false);
     }
-
 }
    
