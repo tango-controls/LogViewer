@@ -73,8 +73,10 @@ public class MyTableModel extends AbstractTableModel {
             if (details1.getTimeStamp()<details2.getTimeStamp()) {
                 return 1;
             }
-            // assume not two events are logged at exactly the same time
-            return -1;
+            if (details1.getTimeStamp()>details2.getTimeStamp()) {
+                return -1;
+            }
+            return 0;
         }
     }
 
