@@ -14,17 +14,16 @@
 
 MAJOR_REV   = 2
 MIDDLE_REV  = 0
-MINOR_REV   = 1
+MINOR_REV   = 2
 
 APPLI_VERS	=	$(MAJOR_REV).$(MIDDLE_REV).$(MINOR_REV)
 SVN_TAG_REV =	Release-$(MAJOR_REV).$(MIDDLE_REV).$(MINOR_REV)
 
-PACKAGE        = logviewer
-JAR_NAME      = LogViewer
-TANGO_HOME     = /segfs/tango
+PACKAGE     = logviewer
+JAR_NAME    = LogViewer
+TANGO_HOME  = /segfs/tango
 SVN_LOG_VIEWER_PATH = $(SVN_TCS)/tools/$(PACKAGE)
-JAR_DIR    = $(TANGO_HOME)/release/java/appli
-#JAR_DIR    = .
+JAR_DIR     = $(TANGO_HOME)/release/java/appli
 
 # -----------------------------------------------------------------
 #
