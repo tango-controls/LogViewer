@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<project name="LogViewer" default="prepareSource" basedir=".">
+	<target name="prepareSource">
+		<delete dir="./target/src"/>
+		<mkdir dir="./target/src/fr/esrf/logviewer"/>
+		<mkdir dir="./target/src/LogConsumer"/>
+		<copy todir="./target/src/fr/esrf/logviewer">
+			<fileset dir="./fr/esrf/logviewer">
+				 <include name="**/*.*"/>
+				 <exclude name="**/CVS/**/*.*"/>
+			</fileset>
+		</copy>
+		<copy todir="./target/src/LogConsumer">
+			<fileset dir="./LogConsumer">
+				 <include name="**/*.*"/>
+				 <exclude name="**/CVS/**/*.*"/>
+			</fileset>
+		</copy>
+	</target>
+</project>
