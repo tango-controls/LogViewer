@@ -461,10 +461,10 @@ public class Main extends JFrame {
                 loggingReceiver.setHistoryArea(mHistoryArea);
             }
         } catch (Exception e) {
-            LOG.fatal("Unable to instanciate the TANGO log consumer device. Quiting", e);
+            LOG.fatal("Unable to do an instance of TANGO log consumer device. Quiting", e);
             JOptionPane.showMessageDialog(
                     this,
-                    "Unable to instanciate the TANGO log consumer device. Quiting",
+                    "Unable to do an instance of TANGO log consumer device. Quiting",
                     "Tango Log Viewer",
                     JOptionPane.ERROR_MESSAGE);
             exitForm();
