@@ -60,22 +60,17 @@
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoServer</artifactId>
-			<version>9.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.tango.atk</groupId>
-			<artifactId>ATKCore</artifactId>
-			<version>9.1.16</version>
+			<version>RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tango.atk</groupId>
 			<artifactId>ATKWidget</artifactId>
-            <version>9.1.16</version>
+            <version>RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-            <version>1.2.15</version>
+            <version>RELEASE</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.sun.jmx</groupId>
