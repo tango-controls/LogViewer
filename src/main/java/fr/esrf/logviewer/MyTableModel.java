@@ -58,7 +58,7 @@ public class MyTableModel extends AbstractTableModel {
     /**
      * use the compare logging events *
      */
-    private class EventComparator implements Comparator<EventDetails> {
+    private static class EventComparator implements Comparator<EventDetails> {
         /** @see Comparator **/
         public int compare(EventDetails details1, EventDetails details2) {
             if ((details1==null) && (details2==null)) {
@@ -70,13 +70,7 @@ public class MyTableModel extends AbstractTableModel {
             }
 
             // will assume only have LoggingEvent
-            if (details1.getTimeStamp()<details2.getTimeStamp()) {
-                return 1;
-            }
-            if (details1.getTimeStamp()>details2.getTimeStamp()) {
-                return -1;
-            }
-            return 0;
+            return Long.compare(details2.getTimeStamp(), details1.getTimeStamp());
         }
     }
 
@@ -136,7 +130,7 @@ public class MyTableModel extends AbstractTableModel {
                     }
                     mPendingEvents.clear();
                     if (needUpdate) {
-                        Collections.sort(mAllEvents, new EventComparator());
+                        mAllEvents.sort(new EventComparator());
                         lastUpdateTime = updateFilteredEvents(toHead);
                     }
                 }

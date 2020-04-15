@@ -11,6 +11,7 @@ package fr.esrf.logviewer;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.Database;
+import fr.esrf.tangoatk.widget.util.ErrorPane;
 import fr.esrf.tangoatk.widget.util.Splash;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -25,9 +26,7 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Properties;
+import java.util.*;
 import java.util.List;
 
 // AWT stuffs
@@ -41,8 +40,6 @@ import java.util.List;
  * @author <a href="mailto:oliver@puppycrawl.com">Oliver Burn</a>
  */
 public class Main extends JFrame {
-
-    private final static String APP_RELEASE = "2.0.1";
 
     // use to log messages
     private static final Logger LOG = Logger.getLogger(Main.class);
@@ -83,7 +80,7 @@ public class Main extends JFrame {
      * if called from another application..
      */
     //=========================================================================
-    private boolean closeOnExit = false;
+    private boolean closeOnExit;
 
     @SuppressWarnings("unused")
     public Main(JFrame parent) {
@@ -92,7 +89,7 @@ public class Main extends JFrame {
 
     //=========================================================================
     //=========================================================================
-    public Main(String[] aArgs, boolean closeOnExit) {
+    public Main(String[] inArgs, boolean closeOnExit) {
         // Super class setup
         super("Tango LogViewer (exported as ...)");
         initLog4J();
@@ -110,15 +107,16 @@ public class Main extends JFrame {
 
         // Create startup screen
         Splash splash = new Splash();
-        splash.setTitle("TANGO LogViewer");
-        splash.setCopyright("(c) TANGO Team 2002-2010 / (c) Apache Project 2002");
+        splash.setTitle(getApplicationName());
+        splash.setCopyright("(c) TANGO Team 2002-2020 / (c) Apache Project 2002");
         splash.setMaxProgress(10);
         splash.setMessage("Setting up UI...");
         int splashProgression = 1;
+
         // Animate progress bar
         splash.progress(splashProgression++);
         // Set main font
-        Font font = new Font("terminal", 0, 12);
+        Font font = new Font("terminal", Font.PLAIN, 12);
         UIManager.put("Label.font", font);
         UIManager.put("MenuBar.font", font);
         UIManager.put("Menu.font", font);
@@ -141,16 +139,17 @@ public class Main extends JFrame {
         JMenu menu = new JMenu("File");
         menuBar.add(menu);
         // Populate the File menu
+        LoadXMLAction xmlAction = null;
         try {
             // Instance the XML file loader
-            final LoadXMLAction lxa = new LoadXMLAction(this, model);
+            xmlAction = new LoadXMLAction(this, model);
             // Create the Load File item
             final JMenuItem loadMenuItem = new JMenuItem("Load file...");
             loadMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
             // Add it the the File menu
             menu.add(loadMenuItem);
             // Link the LoadXMLAction with the Load File item
-            loadMenuItem.addActionListener(lxa);
+            loadMenuItem.addActionListener(xmlAction);
         } catch (NoClassDefFoundError e) {
             // Unable to locate the LoadXMLAction class
             LOG.info("Missing classes for XML parser", e);
@@ -174,22 +173,16 @@ public class Main extends JFrame {
         menu.add(exitMenuItem);
         // Link an action with the Exit item
         exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
-        exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitBtnActionPerformed();
-            }
-        });
+        exitMenuItem.addActionListener(evt -> exitBtnActionPerformed());
         //-- FILE MENU
         JMenu actionMenu = new JMenu("Actions");
         menuBar.add(actionMenu);
         // Populate the Action menu
         JMenuItem anItem = new JMenuItem("Refresh Device Tree");
-        anItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mLabel.setText("Refreshing the device tree... ");
-                refreshTree();
-                mLabel.setText(" ");
-            }
+        anItem.addActionListener(e -> {
+            mLabel.setText("Refreshing the device tree... ");
+            refreshTree();
+            mLabel.setText(" ");
         });
         actionMenu.add(anItem);
         actionMenu.add(new JSeparator());
@@ -198,23 +191,17 @@ public class Main extends JFrame {
         actionMenu.add(anItem);
         actionMenu.add(new JSeparator());
         anItem = new JMenuItem("Remove All Logging Source");
-        anItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mLabel.setText("Removing all logging source... ");
-                if (!loggingReceiver.removeAllSources()) {
-                    mHistoryArea.write("Removed all sources");
-                }
-                mLabel.setText(" ");
+        anItem.addActionListener(e -> {
+            mLabel.setText("Removing all logging source... ");
+            if (!loggingReceiver.removeAllSources()) {
+                mHistoryArea.write("Removed all sources");
             }
+            mLabel.setText(" ");
         });
         actionMenu.add(anItem);
         actionMenu.add(new JSeparator());
         anItem = new JMenuItem("Clear history");
-        anItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mHistoryArea.clear();
-            }
-        });
+        anItem.addActionListener(e -> mHistoryArea.clear());
         actionMenu.add(anItem);
 
         // Animate progress bar
@@ -234,7 +221,7 @@ public class Main extends JFrame {
         LogTableRowRenderer dtcr = new LogTableRowRenderer();
         int i = 0;
         TableColumn tc;
-        int col_width[] = {50, 160, 75, 160, 500};
+        int[] col_width = {50, 160, 75, 160, 500};
         int width = 0;
         while (cenum.hasMoreElements()) {
             width += col_width[i];
@@ -273,18 +260,10 @@ public class Main extends JFrame {
         mMemberPopup.add(mMemberNameItem);
         mMemberPopup.add(new JSeparator());
         anItem = new JMenuItem("Add");
-        anItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addLoggingSource();
-            }
-        });
+        anItem.addActionListener(e -> addLoggingSource());
         mMemberPopup.add(anItem);
-        anItem = new JMenuItem("Add Colocated");
-        anItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addCoLocatedSources();
-            }
-        });
+        anItem = new JMenuItem("Add Collocated");
+        anItem.addActionListener(e -> addCoLocatedSources());
     /*
     mMemberPopup.add(anItem);
     anItem = new JMenuItem("Add Tango Core Logger");
@@ -299,18 +278,10 @@ public class Main extends JFrame {
         mMemberPopup.add(new LoggingLevelMenu("Add/Set Logging Level", mMemberLevelGroup1, true));
         mMemberPopup.add(new JSeparator());
         anItem = new JMenuItem("Remove");
-        anItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                removeLoggingSource();
-            }
-        });
+        anItem.addActionListener(e -> removeLoggingSource());
         mMemberPopup.add(anItem);
         anItem = new JMenuItem("Remove Colocated");
-        anItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                removeCoLocatedSources();
-            }
-        });
+        anItem.addActionListener(e -> removeCoLocatedSources());
         mMemberPopup.add(anItem);
     /*
     anItem = new JMenuItem("Remove Tango Core Logger");
@@ -360,44 +331,37 @@ public class Main extends JFrame {
         getContentPane().add(mLabel, BorderLayout.SOUTH);
         // Create the TANGO log receiver (i.e. the LogConsumer device)
         splash.setMessage("Starting up the LogConsumer device...");
-        setupReceiver(aArgs, model);
+        setupReceiver(inArgs, model);
         // Animate progress bar
         splash.progress(splashProgression++);
         if (loggingReceiver.isRunningInStaticMode()) {
             actionMenu.add(new JSeparator());
             menu = new JMenu("Logging Sources Property");
             anItem = new JMenuItem("Save");
-            anItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    mLabel.setText("Saving logging source list into the TANGO database...");
-                    loggingReceiver.setLoggingSourceProperty();
-                    mLabel.setText(" ");
-                }
+            anItem.addActionListener(e -> {
+                mLabel.setText("Saving logging source list into the TANGO database...");
+                loggingReceiver.setLoggingSourceProperty();
+                mLabel.setText(" ");
             });
             menu.add(anItem);
             anItem = new JMenuItem("Delete");
-            anItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    mLabel.setText("Deleting logging source list from the TANGO database...");
-                    loggingReceiver.deleteLoggingSourceProperty();
-                    mLabel.setText(" ");
-                }
+            anItem.addActionListener(e -> {
+                mLabel.setText("Deleting logging source list from the TANGO database...");
+                loggingReceiver.deleteLoggingSourceProperty();
+                mLabel.setText(" ");
             });
             menu.add(anItem);
             anItem = new JMenuItem("Restore");
-            anItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    mLabel.setText("Restoring logging sources from the TANGO database...");
-                    loggingReceiver.removeAllSources();
-                    loggingReceiver.getLoggingSourceProperty();
-                    mLabel.setText(" ");
-                }
+            anItem.addActionListener(e -> {
+                mLabel.setText("Restoring logging sources from the TANGO database...");
+                loggingReceiver.removeAllSources();
+                loggingReceiver.getLoggingSourceProperty();
+                mLabel.setText(" ");
             });
             menu.add(anItem);
             actionMenu.add(menu);
         }
-        String dev_name = loggingReceiver.getDeviceName();
-        setTitle("Tango Log Viewer " + APP_RELEASE + " [" + dev_name + "]");
+
         // Pack and make the main window visible
         pack();
         setLocationRelativeTo(splash);
@@ -413,17 +377,23 @@ public class Main extends JFrame {
         splash.dispose();
         devTree.setVisible(true);
 
+        // Check if in args contain a file name
+        // If true, display content
+        if (inArgs.length==2 && inArgs[0].equals("-f") && xmlAction!=null) {
+            try {
+                xmlAction.loadFile(inArgs[1]);
+            } catch (Exception e) {
+                ErrorPane.showErrorMessage(this, null, e);
+            }
+        }
+        String deviceName = loggingReceiver.getDeviceName();
+        setTitle(getApplicationName() + "   [" + deviceName + "]");
+
         if (!inited) {
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                public void run() {
-                    Main.cleanup();
-                }
-            });
+            Runtime.getRuntime().addShutdownHook(new Thread(Main::cleanup));
             inited = true;
         }
-
     }
-
     //===============================================================
     /**
      * Exit or close the Application
@@ -451,10 +421,10 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-    private void setupReceiver(String[] aArgs, MyTableModel aModel) {
+    private void setupReceiver(String[] inArgs, MyTableModel aModel) {
         try {
             if (loggingReceiver==null) {
-                loggingReceiver = new TangoLoggingReceiver(aArgs, aModel, mHistoryArea);
+                loggingReceiver = new TangoLoggingReceiver(inArgs, aModel, mHistoryArea);
                 loggingReceiver.start();
             } else {
                 loggingReceiver.setTableModel(aModel);
@@ -486,7 +456,6 @@ public class Main extends JFrame {
         mLabel.reset();
     }
     //=========================================================================
-
     private void addCoLocatedSources() {
         Object n = devTree.getLastSelectedPathComponent();
         if (n==null) {
@@ -502,7 +471,6 @@ public class Main extends JFrame {
         mLabel.reset();
     }
     //=========================================================================
-
     private void removeLoggingSource() {
         Object n = devTree.getLastSelectedPathComponent();
         if (n==null) {
@@ -518,7 +486,6 @@ public class Main extends JFrame {
         mLabel.reset();
     }
     //=========================================================================
-
     private void removeCoLocatedSources() {
         Object n = devTree.getLastSelectedPathComponent();
         if (n==null) {
@@ -534,7 +501,6 @@ public class Main extends JFrame {
         mLabel.reset();
     }
     //=========================================================================
-
     public void deviceTreeMousePressed(MouseEvent evt) {
         int selectedRow = devTree.getRowForLocation(evt.getX(), evt.getY());
         if (selectedRow!=-1) {
@@ -574,7 +540,6 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-
     public void deviceTreeMouseReleased(MouseEvent evt) {
         int selectedRow = devTree.getRowForLocation(evt.getX(), evt.getY());
         if (selectedRow!=-1 && (evt.isPopupTrigger() || mPopupTrigger)) {
@@ -591,7 +556,6 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-
     private class SourceListActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             mHistoryArea.write("Current source list:");
@@ -606,7 +570,6 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-
     private class BasicLevelActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String levelStr = ((JMenuItem) e.getSource()).getText();
@@ -627,7 +590,7 @@ public class Main extends JFrame {
     }
     //=========================================================================
 
-    private class BasicLoggingLevelMenuItem extends JMenuItem {
+    private static class BasicLoggingLevelMenuItem extends JMenuItem {
         private int mLevel;
 
         public BasicLoggingLevelMenuItem(String iText, int iLevel) {
@@ -639,9 +602,7 @@ public class Main extends JFrame {
             return mLevel;
         }
     }
-
     //=========================================================================
-
     private class BasicLoggingLevelMenu extends JMenu {
         public BasicLoggingLevelMenu(String title) {
             super(title);
@@ -666,9 +627,8 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-
     private class LevelActionListener implements ActionListener {
-        private boolean mAddBefore = false;
+        private boolean mAddBefore;
 
         public LevelActionListener(boolean add_before) {
             mAddBefore = add_before;
@@ -696,8 +656,7 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-
-    private class LoggingLevelMenuItem extends JRadioButtonMenuItem {
+    private static class LoggingLevelMenuItem extends JRadioButtonMenuItem {
         private int mLevel;
 
         public LoggingLevelMenuItem(String iText, int iLevel) {
@@ -710,7 +669,6 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-
     private class LoggingLevelMenu extends JMenu {
         public LoggingLevelMenu(String title, ButtonGroup _group, boolean add_before) {
             super(title);
@@ -748,8 +706,7 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-
-    private class CustomLabel extends JLabel {
+    private static class CustomLabel extends JLabel {
         public CustomLabel() {
             super.setText(" ");
         }
@@ -764,8 +721,7 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-
-    public class LogTableRowRenderer extends DefaultTableCellRenderer {
+    public static class LogTableRowRenderer extends DefaultTableCellRenderer {
 
         private final Color _scolor = new Color(204, 204, 255);
         private final Color _color = new Color(230, 230, 230);
@@ -827,7 +783,6 @@ public class Main extends JFrame {
                     col);
         }
     }
-
     //=========================================================================
     private void initTree() {
 
@@ -853,10 +808,8 @@ public class Main extends JFrame {
         treeView.getViewport().add(devTree);
 
     }
-
     //=========================================================================
     // Search the tree
-
     public TangoNode searchNode(TangoNode startNode, String value) {
 
         int numChild = treeModel.getChildCount(startNode);
@@ -877,10 +830,8 @@ public class Main extends JFrame {
         }
 
     }
-
     //=========================================================================
     // Refresh the tree
-
     public void refreshTree() {
 
         treeView.getViewport().removeAll();
@@ -918,9 +869,7 @@ public class Main extends JFrame {
             devTree.scrollPathToVisible(newPath);
 
         }
-
     }
-
     //=========================================================================
     @SuppressWarnings("unused")
     public void selectDevice(String devName) {
@@ -951,15 +900,15 @@ public class Main extends JFrame {
     // STATIC METHODS
     //=========================================================================
     public static void showTangoError(DevFailed e) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         if (e!=null) {
             for (int i = 0 ; i<e.errors.length ; i++) {
-                result += "Desc -> " + e.errors[i].desc + "\n";
-                result += "Reason -> " + e.errors[i].reason + "\n";
-                result += "Origin -> " + e.errors[i].origin + "\n";
+                result.append("Desc -> ").append(e.errors[i].desc).append("\n");
+                result.append("Reason -> ").append(e.errors[i].reason).append("\n");
+                result.append("Origin -> ").append(e.errors[i].origin).append("\n");
             }
             if (result.length()>0)
-                JOptionPane.showMessageDialog(self, result, "Tango error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(self, result.toString(), "Tango error", JOptionPane.ERROR_MESSAGE);
 
         }
     }
@@ -979,8 +928,18 @@ public class Main extends JFrame {
         }
     }
     //=========================================================================
-    public static void main(String[] aArgs) {
-        new Main(aArgs, false);
+    public String getApplicationName() {
+        String applicationName = getClass().getPackage().getImplementationTitle();
+        String release = getClass().getPackage().getImplementationVersion();
+        if (release != null)
+            applicationName += "-" + release;
+        else
+            applicationName = "LogViewer not released";
+        return applicationName;
+    }
+    //=========================================================================
+    public static void main(String[] args) {
+        new Main(args, false);
     }
 }
    

@@ -28,8 +28,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -50,6 +50,8 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>fr.esrf.logviewer.Main</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                 </configuration>
@@ -65,6 +67,11 @@
 		<dependency>
 			<groupId>org.tango.atk</groupId>
 			<artifactId>ATKWidget</artifactId>
+            <version>RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.tango.atk</groupId>
+			<artifactId>ATKCore</artifactId>
             <version>RELEASE</version>
 		</dependency>
 		<dependency>
